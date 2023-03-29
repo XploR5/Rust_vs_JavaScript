@@ -1,0 +1,28 @@
+[package]
+name = "singleActix"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "4"
+config = "0.13.3"
+deadpool-postgres = { version = "0.10.2", features = ["serde"] }
+derive_more = "0.99.17"
+dotenv = "0.15.0"
+serde = { version = "1.0.137", features = ["derive"] }
+tokio-pg-mapper = "0.2.0"
+tokio-pg-mapper-derive = "0.2.0"
+tokio-postgres = "0.7.6"
+chrono = "0.4.24"
+rand = "0.8.5"
+warp = "0.3.3"
+tokyo = "1.0.0"
+tokio = "1.26.0"
+futures = "0.3.27"
+serde-datetime = "0.2.2"
+serde_with = "2.3.1"
+serde_json = "1.0.95"
+postgres = "0.19.5"
+sqlx = { version = "0.6.3", features = ["runtime-actix-native-tls", "postgres", "time"] }
