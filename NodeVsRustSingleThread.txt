@@ -1,0 +1,113 @@
+Rust Req JSON
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 60
+}
+
+
+Node Req JSON
+{
+    "plantId": [1,2,3],
+    "startDate": "2022-01-01T00:00:00.000Z",
+    "endDate": "2022-01-02T00:00:00.000Z",
+    "interval": "60"
+}
+
+
+Responce (same)
+{
+    "data": "Data Added successfully",
+    "count": 4323
+}
+
+
+Rust - 201Created 5.60 s 160 B
+Node - 201Created 1.72 s 264 B
+
+
+metric                  Rust        Node
+
+Reqest and Responce Sizes
+
+Res Size                160 B        264
+Body                    47 B         47
+Header                  113 B        217
+
+Req Size                399 B        417
+Body                    134 B        152
+Header                  265 B        265
+
+
+Time
+
+prep                    16.81 ms    13.65
+Soc init                0.71 ms     0.82
+Dns look                0           0
+Tcp Hand                0.35 ms     0.2    
+Transfer start          5590 ms     1716.8
+Download                2.4 ms      2.66
+Process                 0.15 ms     0.71
+Total                   5610 ms     1734.82
+                        5.61 S      1.7 S
+
+
+
+
+----------- TEST 2 -------------
+
+
+Rust Req JSON
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 20
+}
+
+
+Node Req JSON
+{
+    "plantId": [1,2,3],
+    "startDate": "2022-01-01T00:00:00.000Z",
+    "endDate": "2022-01-02T00:00:00.000Z",
+    "interval": "20"
+}
+
+
+Responce (same)
+{
+    "data": "Data Added successfully",
+    "count": 12963
+}
+
+
+Rust - 201Created 17.81 s 161 B
+Node - 201Created 04.64 s 265 B
+
+
+metric                  Rust        Node
+
+Reqest and Responce Sizes
+
+Res Size                161 B        265
+Body                    48 B         48
+Header                  113 B        217
+
+Req Size                399 B        401
+Body                    134 B        136
+Header                  265 B        265
+
+
+Time
+
+prep                    14.36 ms    13.82
+Soc init                1.48 ms     1.38
+Dns look                0           0
+Tcp Hand                0.18 ms     0.38    
+Transfer start          17800 ms    4630 ms
+Download                5.29 ms     2.51
+Process                 0.25 ms     0.11
+Total                   17820 ms    4650 ms
+                        17.82 S     4.65 S

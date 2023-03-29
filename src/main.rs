@@ -1,10 +1,6 @@
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use chrono::{DateTime, FixedOffset, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::{PgConnectOptions, PgPool};
-use sqlx::types::time::OffsetDateTime;
-use sqlx::{ConnectOptions, Executor};
-use postgres::{NoTls};
 
 #[derive(Debug, Deserialize)]
 struct CreateDataRequest {
