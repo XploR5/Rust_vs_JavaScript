@@ -57,7 +57,7 @@ async fn create_data_for_plant(
         let createdat = &row.1; // createdat is a String
         sqlx::query!(
             "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
-            &row.0, &row.0, &row.2, &row.3
+            &row.0, createdat, &row.2, &row.3
         )
         .execute(pool.as_ref())
         .await
