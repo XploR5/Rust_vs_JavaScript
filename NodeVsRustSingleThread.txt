@@ -154,6 +154,33 @@ larger data
 
 Rust - 71.52 Seconds ( 1M 11S) (using normal cargo run)
 Node - 53.67 Seconds
-Rust - 48 Seconds (using cargo run --release)
+Rust - 42 Seconds (using cargo run --release)
 
 
+
+---------- Test 5 ---------------
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 1900805
+}
+
+
+Rust - 8M 57S (~ 9M)
+Node - Could not get response Error: socket hang up
+
+
+
+---- rohit test ----
+for 10 plants from 1 - 23 days
+
+node - 3M 10S
+Rust - 13 M
+Rust - 9.5 M (cargo run --r)
+--------------------

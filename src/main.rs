@@ -86,7 +86,7 @@ async fn main() -> std::io::Result<()> {
     .bind("127.0.0.1:3000")?
     .run()
     .await
-} 
+}
 */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,9 +94,14 @@ async fn main() -> std::io::Result<()> {
 
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use chrono::{DateTime, Utc};
+use futures::stream::iter;
 use rand::Rng;
+use rayon::iter;
 use sqlx::postgres::{PgConnectOptions, PgPool};
 use sqlx::{Error, Executor, Postgres, Transaction};
+use std::cell::RefCell;
+use std::sync::Mutex;
+use std::time::Duration;
 
 #[derive(Debug, serde::Deserialize)]
 struct CreateDataRequest {
@@ -123,6 +128,7 @@ async fn create_data_for_plant(
         interval,
     } = req.into_inner();
 
+/* 
     let mut list = vec![];
 
     for i in 0..plant_id.len() {
@@ -145,19 +151,45 @@ async fn create_data_for_plant(
         }
     }
 
+*/
+    ////////////////// NEW ADDS ///////////////////
+    
+    let mut list = Vec::new();
+    let mut rng = rand::thread_rng();
+    let start_datetime = DateTime::parse_from_rfc3339(&start_date).unwrap().with_timezone(&Utc);
+    let end_datetime = DateTime::parse_from_rfc3339(&end_date).unwrap().with_timezone(&Utc);
+    let interval_duration = chrono::Duration::from_std(Duration::from_secs(interval.try_into().unwrap())).unwrap();
+
+    for plant in plant_id {
+    let mut current_datetime = start_datetime;
+    while current_datetime <= end_datetime {
+        let obj = (
+            plant,
+            current_datetime.to_rfc3339(), // convert to string
+            rng.gen_range(1..100),
+            rng.gen_range(1..100),
+        );
+        list.push(obj);
+        current_datetime = current_datetime + interval_duration;
+        }
+    }
+
+    ////////////////////////
+
     let mut tx = pool.begin().await.unwrap();
     let mut count = 0;
 
     for row in &list {
         let createdat = &row.1; // createdat is a String
-        let result: Result<_, Error> =
-            sqlx::query("INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)")
-                .bind(&row.0)
-                .bind(createdat)
-                .bind(&row.2)
-                .bind(&row.3)
-                .execute(&mut tx)
-                .await;
+        let result: Result<_, Error> = sqlx::query(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+        )
+        .bind(&row.0)
+        .bind(createdat)
+        .bind(&row.2)
+        .bind(&row.3)
+        .execute(&mut tx)
+        .await;
 
         if result.is_err() {
             let _ = tx.rollback().await;
