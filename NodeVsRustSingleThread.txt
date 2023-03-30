@@ -111,3 +111,49 @@ Download                5.29 ms     2.51
 Process                 0.25 ms     0.11
 Total                   17820 ms    4650 ms
                         17.82 S     4.65 S
+
+
+
+------------------- Test 3 ---------------------
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 51843
+}
+
+Rust old - 69 Seconds
+Rust new - 23 Seconds (used Transaction - single optimization)
+Node - 15 seconds
+
+
+
+Takeaway - Node optimization is better (why? Node and the libraries used are mature and optmized for webdevelopment)
+for rust we need experienced programmers who can write optimized code from the begining.
+
+
+--------------- Test 4 -----------------
+larger data
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-03T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 172805
+}
+
+
+Rust - 71.52 Seconds ( 1M 11S) (using normal cargo run)
+Node - 53.67 Seconds
+Rust - 48 Seconds (using cargo run --release)
+
+
