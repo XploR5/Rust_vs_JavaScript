@@ -193,18 +193,37 @@ Rust - 9.5 M (cargo run --r)
     "totalduration": 65200
 }
 
+//////////////// NEW
+
 {
     "data": "Data Added successfully",
-    "count": 172805,
-    "createduration": 36,
-    "insertduration": 62334,
-    "totalduration": 62370
+    "count": 17285,
+    "datacreate": 258,
+    "datainsert": 7605,
+    "programend": 7863,
+    "programLang": "javascript"
 }
 
+{
+    "data": "Data Added successfully",
+    "count": 17285,
+    "createduration": 5,
+    "insertduration": 6764,
+    "totalduration": 6769,
+    "programlang": "Rust"
+}
+
+-----
 
 
 
 
+
+
+
+
+
+/////////////////////////////////////// SAVE
 
 
     let mut list = vec![];

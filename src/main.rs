@@ -24,6 +24,7 @@ struct CreateDataResponse {
     createduration: u128,
     insertduration: u128,
     totalduration: u128,
+    programlang: String,
 }
 
 async fn create_data_for_plant(
@@ -91,7 +92,7 @@ async fn create_data_for_plant(
     let insertduration = totalduration - createduration; // stop timer
     print!("Time for insertion into db -> {}ns", insertduration);
 
-
+    let programlang = format!("Rust");
     if let Err(_) = tx.commit().await {
         return HttpResponse::InternalServerError().finish();
     }
@@ -102,6 +103,7 @@ async fn create_data_for_plant(
         createduration,
         insertduration,
         totalduration,
+        programlang,
     })  
 }
 
