@@ -85,8 +85,8 @@ async fn create_data_for_plant(
                 let obj = (
                     plant,
                     current_datetime.to_rfc3339(), // convert to string
-                    fastrand::Rng::new().u32(1..=100),
-                    fastrand::Rng::new().u32(1..=100),
+                    fastrand::Rng::new().i32(1..=100),
+                    fastrand::Rng::new().i32(1..=100),
                 );
                 list_clone.push(obj);
                 current_datetime = current_datetime + interval_duration;
