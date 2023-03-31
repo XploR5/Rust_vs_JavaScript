@@ -1,3 +1,70 @@
+------------- Test1 --------------
+
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 60
+}
+
+--- Rust real multithreading 9S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 9046,
+    "insertduration": 0, (wrong)
+    "totalduration": 9046,
+    "programlang": "Rust"
+}
+
+
+--- Rust New multi thread_rng - 38S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 37455,
+    "totalduration": 37492,
+    "programlang": "Rust"
+}
+
+
+---- Rust old - 46S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 45576,
+    "totalduration": 45613,
+    "programlang": "Rust"
+}
+
+----- javascript Single thread - 51S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "datacreate": 1622,
+    "datainsert": 49713,
+    "programend": 51335,
+    "programLang": "javascript"
+}
+
+
+--------------- Test2 --------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Rust Req JSON
 {
     "plant_id": [1, 2, 3],
@@ -174,6 +241,17 @@ Rust - 42 Seconds (using cargo run --release)
 
 Rust - 8M 57S (~ 9M)
 Node - Could not get response Error: socket hang up
+Rust new_multi_thread - 7M 38S
+
+{
+    "data": "Data Added successfully",
+    "count": 1900805,
+    "createduration": 421,
+    "insertduration": 457042,
+    "totalduration": 457463,
+    "programlang": "Rust"
+}
+
 
 
 
@@ -341,3 +419,123 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 */
+
+
+
+
+
+
+---------------------------------------
+
+In the below create_data_for_plant function (written in Rust and Actix web), write code that makes use of the already created functions to properly insert the created data into the database
+
+
+async fn insert_data(pool: &PgPool, data: &[(i32, String, i32, i32)]) -> Result<usize, sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    let mut count = 0;
+
+    for row in data {
+        let createdat = &row.1; // createdat is a String
+        let result: Result<_, sqlx::Error> = sqlx::query(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+        )
+        .bind(&row.0)
+        .bind(createdat)
+        .bind(&row.2)
+        .bind(&row.3)
+        .execute(&mut tx)
+        .await;
+
+        if result.is_err() {
+            let _ = tx.rollback().await;
+            return Err(result.unwrap_err());
+        } else {
+            count += 1;
+        }
+    }
+
+    tx.commit().await?;
+    Ok(count)
+}
+
+
+
+async fn create_data_for_plant(
+    pool: web::Data<PgPool>,
+    req: web::Json<CreateDataRequest>,
+) -> impl Responder {
+    let CreateDataRequest {
+        plant_id,
+        start_date,
+        end_date,
+        interval,
+    } = req.into_inner();
+
+    let start_time = Instant::now(); // start timer
+  
+    let mut list = Vec::new();
+    let mut rng = rand::thread_rng();
+    let start_datetime = DateTime::parse_from_rfc3339(&start_date).unwrap().with_timezone(&Utc);
+    let end_datetime = DateTime::parse_from_rfc3339(&end_date).unwrap().with_timezone(&Utc);
+    let interval_duration = chrono::Duration::from_std(Duration::from_secs(interval.try_into().unwrap())).unwrap();
+
+    // This loop creates and stores data in a vector
+    for plant in plant_id {
+    let mut current_datetime = start_datetime;
+    while current_datetime <= end_datetime {
+        let obj = (
+            plant,
+            current_datetime.to_rfc3339(), // convert to string
+            rng.gen_range(1..100),
+            rng.gen_range(1..100),
+        );
+        list.push(obj);
+        current_datetime = current_datetime + interval_duration;
+        }
+    }
+
+    let createduration = start_time.elapsed().as_millis(); // stop timer
+    print!("Created the obj list in {} ns", createduration);
+
+
+    let mut tx = pool.begin().await.unwrap();
+    let mut count = 0;
+
+    let pool_clone = pool.clone();
+    let insert_task = tokio::task::spawn_blocking(move || {
+        let runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(insert_data(&pool_clone, &list))
+    });
+
+    // This loop takes data from the vector and stores it in the postgreSQL database
+   /* Write code here that uses insert_task and inset_data function to store the data into the database */
+
+
+
+
+
+
+
+    print!("Total duration is {} ns", start_time.elapsed().as_millis());
+    let totalduration = start_time.elapsed().as_millis();
+    
+    let insertduration = totalduration - createduration; // stop timer
+    print!("Time for insertion into db -> {}ns", insertduration);
+
+    let programlang = format!("Rust");
+    if let Err(_) = tx.commit().await {
+        return HttpResponse::InternalServerError().finish();
+    }
+
+    HttpResponse::Created().json(CreateDataResponse {
+        data: "Data Added successfully".to_string(),
+        count,
+        createduration,
+        insertduration,
+        totalduration,
+        programlang,
+    })  
+}
