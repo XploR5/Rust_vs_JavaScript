@@ -1,0 +1,60 @@
+{
+    "data": "Data Added successfully",
+    "count": 34565,
+    "createduration": 8,
+    "insertduration": 8064,
+    "totalduration": 8072,
+    "programlang": "Rust"
+}
+
+
+------------------
+Time - 2M 50S
+
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-05T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 345605,
+    "createduration": 684,
+    "insertduration": 167660,
+    "totalduration": 168344,
+    "programlang": "Rust"
+}
+
+---------------------
+
+Below is a rust code snippet that uses Actix web and PostgreSQL.
+The Vector named list has large number of objects stored in it, these objects are to be inserted into the postgreSQL database.
+The inserting of data into database takes too much time. 
+To speed up this process we can use multithreading.
+Rewrite the below rust code snippet using multithreading, such that ten threads are spawned and inserts the data from the vector into the database simultaniously.
+Start writing the code if everything is clear to you.
+
+
+// This loop takes data from the vector with name list and stores it in the postgreSQL database
+let mut tx = pool.begin().await.unwrap();
+let mut count = 0;
+for row in &list {
+let createdat = &row.1; // createdate is a String
+let result: Result<_, Error> = sqlx::query(
+"INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+)
+.bind(&row.0)
+.bind(createdat)
+.bind(&row.2)
+.bind(&row.3)
+.execute(&mut tx)
+.await;
+if result.is_err() {
+let _ = tx.rollback().await;
+return HttpResponse::InternalServerError().finish();
+} else {
+count += 1;
+}
+}
