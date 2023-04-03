@@ -1,4 +1,91 @@
 {
+    "plant_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 5   
+}
+
+-- Multi-thread  // 4M 7s
+{
+    "data": "Data Added successfully",
+    "count": 0,
+    "createduration": 247963,
+    "insertduration": 0,
+    "totalduration": 247963,
+    "programlang": "Rust"
+}
+
+-- Single-threading
+
+
+------------- Test1 --------------
+
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 60
+}
+
+--- Rust latest multi-thread  11.12 S
+{
+    "data": "Data Added successfully",
+    "count":  158405,
+    "createduration": 11102,
+    "insertduration": 0,
+    "totalduration": 11102,
+    "programlang": "Rust"
+}
+
+
+
+--- Rust real multithreading 9S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 9046,
+    "insertduration": 0, (wrong)
+    "totalduration": 9046,
+    "programlang": "Rust"
+}
+
+
+--- Rust New multi thread_rng - 38S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 37455,
+    "totalduration": 37492,
+    "programlang": "Rust"
+}
+
+
+---- Rust old - 46S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 45576,
+    "totalduration": 45613,
+    "programlang": "Rust"
+}
+
+----- javascript Single thread - 51S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "datacreate": 1622,
+    "datainsert": 49713,
+    "programend": 51335,
+    "programLang": "javascript"
+}
+
+
+------------------
+
+
+{
     "data": "Data Added successfully",
     "count": 34565,
     "createduration": 8,
@@ -18,6 +105,18 @@ Time - 2M 50S
     "interval": 5
 }
 
+-- Multi Threading
+{
+    "data": "Data Added successfully",
+    "count": 0,
+    "createduration": 26365,
+    "insertduration": 0,
+    "totalduration": 26365,
+    "programlang": "Rust"
+}
+
+
+-- Single threading
 {
     "data": "Data Added successfully",
     "count": 345605,

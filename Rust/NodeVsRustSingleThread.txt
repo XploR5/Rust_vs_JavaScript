@@ -1,0 +1,568 @@
+
+// use std::env;
+// use std::thread;
+// use futures::future::join_all;
+// use tokio::task;
+// use rayon::iter;
+// use std::sync::Arc;
+// use async_std::task;
+// use std::sync::Mutex;
+// use rayon::prelude::*;
+// use std::cell::RefCell;
+// use futures::stream::iter;
+// use tokio::runtime::Runtime;
+// use sqlx::postgres::PgPoolOptions;
+// use sqlx::{Executor, Postgres, Transaction};
+// use rand::SeedableRng;
+// use rand::rngs::StdRng;
+// use postgres::Transaction;
+// use std::mem::replace;
+// use rand::Rng;
+// use sqlx::{pool, Postgres}
+
+
+
+------------- Test1 --------------
+
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 60
+}
+
+--- Rust real multithreading 9S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 9046,
+    "insertduration": 0, (wrong)
+    "totalduration": 9046,
+    "programlang": "Rust"
+}
+
+
+--- Rust New multi thread_rng - 38S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 37455,
+    "totalduration": 37492,
+    "programlang": "Rust"
+}
+
+
+---- Rust old - 46S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "createduration": 37,
+    "insertduration": 45576,
+    "totalduration": 45613,
+    "programlang": "Rust"
+}
+
+----- javascript Single thread - 51S
+{
+    "data": "Data Added successfully",
+    "count": 158405,
+    "datacreate": 1622,
+    "datainsert": 49713,
+    "programend": 51335,
+    "programLang": "javascript"
+}
+
+
+--------------- Test2 --------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Rust Req JSON
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 60
+}
+
+
+Node Req JSON
+{
+    "plantId": [1,2,3],
+    "startDate": "2022-01-01T00:00:00.000Z",
+    "endDate": "2022-01-02T00:00:00.000Z",
+    "interval": "60"
+}
+
+
+Responce (same)
+{
+    "data": "Data Added successfully",
+    "count": 4323
+}
+
+
+
+
+
+Rust - 201Created 5.60 s 160 B
+Node - 201Created 1.72 s 264 B
+
+
+metric                  Rust        Node
+
+Reqest and Responce Sizes
+
+Res Size                160 B        264
+Body                    47 B         47
+Header                  113 B        217
+
+Req Size                399 B        417
+Body                    134 B        152
+Header                  265 B        265
+
+
+Time
+
+prep                    16.81 ms    13.65
+Soc init                0.71 ms     0.82
+Dns look                0           0
+Tcp Hand                0.35 ms     0.2    
+Transfer start          5590 ms     1716.8
+Download                2.4 ms      2.66
+Process                 0.15 ms     0.71
+Total                   5610 ms     1734.82
+                        5.61 S      1.7 S
+
+
+
+
+----------- TEST 2 -------------
+
+
+Rust Req JSON
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 20
+}
+
+
+Node Req JSON
+{
+    "plantId": [1,2,3],
+    "startDate": "2022-01-01T00:00:00.000Z",
+    "endDate": "2022-01-02T00:00:00.000Z",
+    "interval": "20"
+}
+
+
+Responce (same)
+{
+    "data": "Data Added successfully",
+    "count": 12963
+}
+
+
+Rust - 201Created 17.81 s 161 B
+Node - 201Created 04.64 s 265 B
+
+
+metric                  Rust        Node
+
+Reqest and Responce Sizes
+
+Res Size                161 B        265
+Body                    48 B         48
+Header                  113 B        217
+
+Req Size                399 B        401
+Body                    134 B        136
+Header                  265 B        265
+
+
+Time
+
+prep                    14.36 ms    13.82
+Soc init                1.48 ms     1.38
+Dns look                0           0
+Tcp Hand                0.18 ms     0.38    
+Transfer start          17800 ms    4630 ms
+Download                5.29 ms     2.51
+Process                 0.25 ms     0.11
+Total                   17820 ms    4650 ms
+                        17.82 S     4.65 S
+
+
+
+------------------- Test 3 ---------------------
+{
+    "plant_id": [1, 2, 3],
+    "start_date": "2022-01-01T00:00:00Z",
+    "end_date": "2022-01-02T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 51843
+}
+
+Rust old - 69 Seconds
+Rust new - 23 Seconds (used Transaction - single optimization)
+Node - 15 seconds
+
+
+
+Takeaway - Node optimization is better (why? Node and the libraries used are mature and optmized for webdevelopment)
+for rust we need experienced programmers who can write optimized code from the begining.
+
+
+--------------- Test 4 -----------------
+larger data
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-03T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 172805
+}
+
+
+Rust - 71.52 Seconds ( 1M 11S) (using normal cargo run)
+Node - 53.67 Seconds
+Rust - 42 Seconds (using cargo run --release)
+
+
+
+---------- Test 5 ---------------
+{
+    "plant_id": [1, 2, 3, 4, 5],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-23T00:00:00.00Z",
+    "interval": 5
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 1900805
+}
+
+
+Rust - 8M 57S (~ 9M)
+Node - Could not get response Error: socket hang up
+Rust new_multi_thread - 7M 38S
+
+{
+    "data": "Data Added successfully",
+    "count": 1900805,
+    "createduration": 421,
+    "insertduration": 457042,
+    "totalduration": 457463,
+    "programlang": "Rust"
+}
+
+
+
+
+---- rohit test ----
+for 10 plants from 1 - 23 days
+
+node - 3M 10S
+Rust - 13 M
+Rust - 9.5 M (cargo run --r)
+--------------------
+
+{
+    "data": "Data Added successfully",
+    "count": 172805,
+    "createduration": 38,
+    "insertduration": 65162,
+    "totalduration": 65200
+}
+
+//////////////// NEW
+
+{
+    "data": "Data Added successfully",
+    "count": 17285,
+    "datacreate": 258,
+    "datainsert": 7605,
+    "programend": 7863,
+    "programLang": "javascript"
+}
+
+{
+    "data": "Data Added successfully",
+    "count": 17285,
+    "createduration": 5,
+    "insertduration": 6764,
+    "totalduration": 6769,
+    "programlang": "Rust"
+}
+
+-----
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////// SAVE
+
+
+    let mut list = vec![];
+
+    for i in 0..plant_id.len() {
+        let mut current_date = DateTime::parse_from_rfc3339(&start_date)
+            .unwrap()
+            .with_timezone(&Utc);
+        let end_date = DateTime::parse_from_rfc3339(&end_date)
+            .unwrap()
+            .with_timezone(&Utc);
+
+        while current_date <= end_date {
+            let obj = (
+                plant_id[i],
+                current_date.to_rfc3339(), // convert to string
+                rand::thread_rng().gen_range(1 .. 100),
+                rand::thread_rng().gen_range(1 .. 100),
+            );
+            list.push(obj);
+            current_date = current_date + chrono::Duration::seconds(interval as i64);
+        }
+    }
+
+
+
+/*
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use serde::{Deserialize, Serialize};
+use sqlx::postgres::{PgConnectOptions, PgPool};
+
+#[derive(Debug, Deserialize)]
+struct CreateDataRequest {
+    plant_id: Vec<i32>,
+    start_date: String,
+    end_date: String,
+    interval: i32,
+}
+
+#[derive(Debug, Serialize)]
+struct CreateDataResponse {
+    data: String,
+    count: usize,
+}
+
+async fn create_data_for_plant(
+    pool: web::Data<PgPool>,
+    req: web::Json<CreateDataRequest>,
+) -> impl Responder {
+    let CreateDataRequest {
+        plant_id,
+        start_date,
+        end_date,
+        interval,
+    } = req.into_inner();
+
+    let mut list = vec![];
+
+    for i in 0..plant_id.len() {
+        let mut current_date = chrono::DateTime::parse_from_rfc3339(&start_date)
+            .unwrap()
+            .with_timezone(&chrono::Utc);
+        let end_date = chrono::DateTime::parse_from_rfc3339(&end_date)
+            .unwrap()
+            .with_timezone(&chrono::Utc);
+
+        while current_date <= end_date {
+            let obj = (
+                plant_id[i],
+                current_date.to_rfc3339(), // convert to string
+                rand::random::<i32>() % 100 + 1,
+                rand::random::<i32>() % 100 + 1,
+            );
+            list.push(obj);
+            current_date = current_date + chrono::Duration::seconds(interval as i64);
+        }
+    }
+
+    for row in &list {
+        let createdat = &row.1; // createdat is a String
+        sqlx::query!(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+            &row.0, createdat, &row.2, &row.3
+        )
+        .execute(pool.as_ref())
+        .await
+        .unwrap();
+    }
+
+    HttpResponse::Created().json(CreateDataResponse {
+        data: "Data Added successfully".to_string(),
+        count: list.len(),
+    })
+}
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    let connect_options = PgConnectOptions::new()
+        .username("postgres")
+        .password("password")
+        .host("localhost")
+        .database("testing_db");
+
+    let pool = PgPool::connect_with(connect_options)
+        .await
+        .expect("Failed to create database pool");
+
+    HttpServer::new(move || {
+        App::new()
+            .data(pool.clone())
+            .service(web::resource("/createdata").route(web::post().to(create_data_for_plant)))
+    })
+    .bind("127.0.0.1:3000")?
+    .run()
+    .await
+}
+*/
+
+
+
+
+
+
+---------------------------------------
+
+In the below create_data_for_plant function (written in Rust and Actix web), write code that makes use of the already created functions to properly insert the created data into the database
+
+
+async fn insert_data(pool: &PgPool, data: &[(i32, String, i32, i32)]) -> Result<usize, sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    let mut count = 0;
+
+    for row in data {
+        let createdat = &row.1; // createdat is a String
+        let result: Result<_, sqlx::Error> = sqlx::query(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+        )
+        .bind(&row.0)
+        .bind(createdat)
+        .bind(&row.2)
+        .bind(&row.3)
+        .execute(&mut tx)
+        .await;
+
+        if result.is_err() {
+            let _ = tx.rollback().await;
+            return Err(result.unwrap_err());
+        } else {
+            count += 1;
+        }
+    }
+
+    tx.commit().await?;
+    Ok(count)
+}
+
+
+
+async fn create_data_for_plant(
+    pool: web::Data<PgPool>,
+    req: web::Json<CreateDataRequest>,
+) -> impl Responder {
+    let CreateDataRequest {
+        plant_id,
+        start_date,
+        end_date,
+        interval,
+    } = req.into_inner();
+
+    let start_time = Instant::now(); // start timer
+  
+    let mut list = Vec::new();
+    let mut rng = rand::thread_rng();
+    let start_datetime = DateTime::parse_from_rfc3339(&start_date).unwrap().with_timezone(&Utc);
+    let end_datetime = DateTime::parse_from_rfc3339(&end_date).unwrap().with_timezone(&Utc);
+    let interval_duration = chrono::Duration::from_std(Duration::from_secs(interval.try_into().unwrap())).unwrap();
+
+    // This loop creates and stores data in a vector
+    for plant in plant_id {
+    let mut current_datetime = start_datetime;
+    while current_datetime <= end_datetime {
+        let obj = (
+            plant,
+            current_datetime.to_rfc3339(), // convert to string
+            rng.gen_range(1..100),
+            rng.gen_range(1..100),
+        );
+        list.push(obj);
+        current_datetime = current_datetime + interval_duration;
+        }
+    }
+
+    let createduration = start_time.elapsed().as_millis(); // stop timer
+    print!("Created the obj list in {} ns", createduration);
+
+
+    let mut tx = pool.begin().await.unwrap();
+    let mut count = 0;
+
+    let pool_clone = pool.clone();
+    let insert_task = tokio::task::spawn_blocking(move || {
+        let runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        runtime.block_on(insert_data(&pool_clone, &list))
+    });
+
+    // This loop takes data from the vector and stores it in the postgreSQL database
+   /* Write code here that uses insert_task and inset_data function to store the data into the database */
+
+
+
+
+
+
+
+    print!("Total duration is {} ns", start_time.elapsed().as_millis());
+    let totalduration = start_time.elapsed().as_millis();
+    
+    let insertduration = totalduration - createduration; // stop timer
+    print!("Time for insertion into db -> {}ns", insertduration);
+
+    let programlang = format!("Rust");
+    if let Err(_) = tx.commit().await {
+        return HttpResponse::InternalServerError().finish();
+    }
+
+    HttpResponse::Created().json(CreateDataResponse {
+        data: "Data Added successfully".to_string(),
+        count,
+        createduration,
+        insertduration,
+        totalduration,
+        programlang,
+    })  
+}
