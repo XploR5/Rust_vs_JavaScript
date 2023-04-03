@@ -46,8 +46,57 @@ struct CreateDataResponse {
     programlang: String,
 }
 
+async fn create_and_insert_data(
+    plant: i32,
+    start_datetime: DateTime<Utc>,
+    end_datetime: DateTime<Utc>,
+    interval_duration: chrono::Duration,
+    pool: web::Data<PgPool>,
+) -> Result<(), sqlx::Error> {
+    print!("plant: {} with st_dtc: {}  end: {} dur: {}\n", plant, start_datetime, end_datetime, interval_duration);
 
- async fn create_and_insert_data(plant: i32, start_datetime: DateTime<Utc>, end_datetime: DateTime<Utc>, interval_duration:  chrono::Duration, pool: web::Data<PgPool>){
+    let mut tx = pool.begin().await?;
+
+    let mut list = Vec::new();
+
+    let mut current_datetime = start_datetime;
+    while current_datetime <= end_datetime {
+        let obj = (
+            plant,
+            current_datetime.to_rfc3339(),
+            i32(..=100),
+            i32(..=100),
+        );
+        list.push(obj);
+        current_datetime = current_datetime + interval_duration;
+    }
+
+    for row in &list {
+        let createdat = &row.1;
+        let result: Result<_, sqlx::Error> = sqlx::query(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
+        )
+        .bind(&row.0)
+        .bind(createdat)
+        .bind(&row.2)
+        .bind(&row.3)
+        .execute(&mut tx)
+        .await;
+        if result.is_err() {
+            let _ = &tx.rollback().await;
+            return Err(result.unwrap_err());
+        }
+    }
+
+    tx.commit().await?;
+    print!("The result is: committed\n");
+    Ok(())
+}
+
+
+
+// ----------------------------------
+ async fn _create_and_insert_data(plant: i32, start_datetime: DateTime<Utc>, end_datetime: DateTime<Utc>, interval_duration:  chrono::Duration, pool: web::Data<PgPool>){
     print!("plant: {}  wit st_dtc: {}  end: {} dur: {}\n", plant, start_datetime, end_datetime, interval_duration);
     
     let mut tx = pool.begin().await.unwrap(); // new
@@ -119,6 +168,8 @@ async fn create_data_for_plant(
     //        create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool.clone()).await;
     // }
 
+
+/* 
     let mut handles = vec![];
     
     for plant in plant_id {
@@ -127,7 +178,47 @@ async fn create_data_for_plant(
             create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool_clone).await;
         });
         handles.push(handle);
+    } */
+
+    let mut handles = vec![];
+
+    for plant in plant_id {
+        let pool_clone = pool.clone();
+        let handle = tokio::spawn(async move {
+            match create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool_clone).await {
+                Ok(res) => {
+                    print!("The result is: {:#?}", res);
+                    res
+                }
+                Err(e) => {
+                    eprintln!("Error occurred: {}", e);
+                    // Err(e)
+                }
+            }
+        });
+        handles.push(handle);
     }
+    
+    let results = futures::future::join_all(handles).await;
+    for res in results {
+        if let Err(e) = res {
+            eprintln!("Error occurred: {}", e);
+        }
+    }
+
+
+    // let mut handles = vec![];
+
+    // for plant in plant_id {
+    //     let pool_clone = pool.clone();
+    //     let handle = tokio::spawn(async move {
+    //         if let Err(e) = create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool_clone).await {
+    //             eprintln!("Error occurred: {}", e);
+    //         }
+    //     });
+    //     handles.push(handle);
+    // }
+
 
     // for plant in plant_id {    
     //     let cloned_plant = plant.clone();
