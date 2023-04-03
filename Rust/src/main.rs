@@ -1,5 +1,7 @@
 // use std::env;
 use std::thread;
+use futures::future::join_all;
+use tokio::task;
 // use rayon::iter;
 // use std::sync::Arc;
 // use async_std::task;
@@ -10,6 +12,9 @@ use std::thread;
 // use tokio::runtime::Runtime;
 // use sqlx::postgres::PgPoolOptions;
 // use sqlx::{Executor, Postgres, Transaction};
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+use fastrand::i32;
 
 use actix_web::{
     web::{self, Data},
@@ -18,7 +23,6 @@ use actix_web::{
 use chrono::{DateTime, Utc};
 use postgres::Transaction;
 use std::mem::replace;
-use async_std::task;
 use rand::Rng;
 use sqlx::{postgres::{PgConnectOptions, PgPool}, pool, Postgres};
 use sqlx::Error;
@@ -47,7 +51,7 @@ struct CreateDataResponse {
     print!("plant: {}  wit st_dtc: {}  end: {} dur: {}\n", plant, start_datetime, end_datetime, interval_duration);
     
     let mut tx = pool.begin().await.unwrap(); // new
-    let mut rng = rand::thread_rng();
+    // let mut rng = rand::thread_rng();
     let mut list = Vec::new();
 
 
@@ -57,8 +61,8 @@ struct CreateDataResponse {
         let obj = (
             plant,
             current_datetime.to_rfc3339(), // convert to string
-            rng.gen_range(1..100),
-            rng.gen_range(1..100),
+            i32(..=100),
+            i32(..=100),
         );
         list.push(obj);
         current_datetime = current_datetime + interval_duration;
@@ -81,8 +85,8 @@ struct CreateDataResponse {
         }
     }
    let res = tx.commit().await;
-    print!("The err is: {:#?}", res);
-    // Ok(())
+    print!("The result is: {:#?}", res);
+    // res
 
 }
 
@@ -111,10 +115,19 @@ async fn create_data_for_plant(
 
 // // focus here 
 
-    for plant in plant_id {    
-           create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool.clone()).await;
-    }
+    // for plant in plant_id {    
+    //        create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool.clone()).await;
+    // }
 
+    let mut handles = vec![];
+    
+    for plant in plant_id {
+        let pool_clone = pool.clone();
+        let handle = tokio::spawn(async move {
+            create_and_insert_data(plant.clone(), start_datetime, end_datetime, interval_duration, pool_clone).await;
+        });
+        handles.push(handle);
+    }
 
     // for plant in plant_id {    
     //     let cloned_plant = plant.clone();
@@ -123,8 +136,8 @@ async fn create_data_for_plant(
     //     let cloned_end = end_datetime.clone();
     //     let cloned_duration = interval_duration.clone();
     
-    //     task::spawn(async move {
-    //         create_and_insert_data(cloned_plant, cloned_start, cloned_end, cloned_duration, cloned_pool).await;
+    //     task::spawn_blocking(move || {
+    //         create_and_insert_data(cloned_plant, cloned_start, cloned_end, cloned_duration, cloned_pool)
     //     });
     // }
 
