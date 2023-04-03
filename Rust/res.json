@@ -5,10 +5,20 @@
     "interval": 5   
 }
 
--- Newest
+-- Fastest Yet :)
 {
     "data": "Data Added successfully",
     "count": 0,
+    "createduration": 16962,
+    "insertduration": 16962,
+    "totalduration": 16962,
+    "programlang": "Rust"
+}
+
+-- Newest
+{
+    "data": "Data Added successfully",
+    "count": 3801610,
     "createduration": 20369,
     "insertduration": 20369,
     "totalduration": 20369,
@@ -19,7 +29,7 @@
 -- Multi-thread  // 4M 7s
 {
     "data": "Data Added successfully",
-    "count": 0,
+    "count": 3801610,
     "createduration": 247963,
     "insertduration": 0,
     "totalduration": 247963,

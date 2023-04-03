@@ -4,10 +4,7 @@ use actix_web::{
 };
 use chrono::{DateTime, Utc};
 use fastrand::i32;
-use sqlx::postgres::PgPoolOptions;
 use sqlx::postgres::{PgConnectOptions, PgPool};
-use sqlx::Error;
-use sqlx::Executor;
 use std::time::{Duration, Instant};
 
 #[derive(Debug, serde::Deserialize)]
@@ -60,7 +57,7 @@ async fn create_and_insert_data(
 let mut tx = pool.begin().await?;
 
 // Define the size of the batch
-const BATCH_SIZE: usize = 100;
+const BATCH_SIZE: usize = 10000;
 
 // Create a buffer to hold the rows
 let mut buffer = Vec::with_capacity(BATCH_SIZE);
