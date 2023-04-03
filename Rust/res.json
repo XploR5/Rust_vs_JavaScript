@@ -5,6 +5,17 @@
     "interval": 5   
 }
 
+-- Newest
+{
+    "data": "Data Added successfully",
+    "count": 0,
+    "createduration": 20369,
+    "insertduration": 20369,
+    "totalduration": 20369,
+    "programlang": "Rust"
+}
+
+
 -- Multi-thread  // 4M 7s
 {
     "data": "Data Added successfully",
@@ -25,6 +36,17 @@
     "start_date": "2023-03-01T00:00:00Z",
     "end_date": "2023-03-23T00:00:00.00Z",
     "interval": 60
+}
+
+
+--- FASTEST
+{
+    "data": "Data Added successfully",
+    "count": 0,
+    "createduration": 1012,
+    "insertduration": 1012,
+    "totalduration": 1012,
+    "programlang": "Rust"
 }
 
 --- Rust latest multi-thread  11.12 S

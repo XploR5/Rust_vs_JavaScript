@@ -4,8 +4,10 @@ use actix_web::{
 };
 use chrono::{DateTime, Utc};
 use fastrand::i32;
+use sqlx::postgres::PgPoolOptions;
 use sqlx::postgres::{PgConnectOptions, PgPool};
 use sqlx::Error;
+use sqlx::Executor;
 use std::time::{Duration, Instant};
 
 #[derive(Debug, serde::Deserialize)]
@@ -33,13 +35,11 @@ async fn create_and_insert_data(
     interval_duration: chrono::Duration,
     pool: web::Data<PgPool>,
 ) -> Result<(), sqlx::Error> {
-    
     print!(
         "plant: {} with st_dtc: {}  end: {} dur: {}\n",
         plant, start_datetime, end_datetime, interval_duration
     );
 
-    let mut tx = pool.begin().await?;
     let mut list = Vec::new();
 
     let mut current_datetime = start_datetime;
@@ -55,24 +55,58 @@ async fn create_and_insert_data(
         current_datetime = current_datetime + interval_duration;
     }
 
-    for row in &list {
-        let createdat = &row.1;
-        let result: Result<_, sqlx::Error> = sqlx::query(
-            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES ($1, $2, $3, $4)",
-        )
-        .bind(&row.0)
-        .bind(createdat)
-        .bind(&row.2)
-        .bind(&row.3)
-        .execute(&mut tx)
-        .await;
+// ------------------ //
+
+let mut tx = pool.begin().await?;
+
+// Define the size of the batch
+const BATCH_SIZE: usize = 100;
+
+// Create a buffer to hold the rows
+let mut buffer = Vec::with_capacity(BATCH_SIZE);
+
+for (index, row) in list.iter().enumerate() {
+    let createdat = &row.1;
+
+    // Add the row to the buffer
+    buffer.push((row.0, createdat, row.2, row.3));
+
+    // If the buffer is full or we have reached the end of the list
+    if buffer.len() >= BATCH_SIZE || index == list.len() - 1 {
+        // Generate the query string with placeholders for multiple rows
+        let query_str = format!(
+            "INSERT INTO single(plant_id, createdat, quality, performance) VALUES {}",
+            buffer
+                .iter()
+                .enumerate()
+                .map(|(i, _)| format!("(${}, ${}, ${}, ${})", i * 4 + 1, i * 4 + 2, i * 4 + 3, i * 4 + 4))
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+
+        // Execute the insert statement with all the rows in the buffer
+        let mut query = sqlx::query(&query_str);
+        for (i, row) in buffer.iter().enumerate() {
+            query = query.bind(row.0).bind(row.1).bind(row.2).bind(row.3);
+        }
+        let result = query.execute(&mut tx).await;
+
+        // Clear the buffer
+        buffer.clear();
+
         if result.is_err() {
             let _ = &tx.rollback().await;
             return Err(result.unwrap_err());
         }
     }
+}
 
-    tx.commit().await?;
+tx.commit().await?;
+
+    
+
+    // --------------------- //
+
     print!("The result is: committed\n");
     Ok(())
 }
@@ -81,7 +115,6 @@ async fn create_data_for_plant(
     pool: web::Data<PgPool>,
     req: web::Json<CreateDataRequest>,
 ) -> impl Responder {
-
     let CreateDataRequest {
         plant_id,
         start_date,
@@ -90,7 +123,7 @@ async fn create_data_for_plant(
     } = req.into_inner();
 
     let start_time = Instant::now(); // start timer
-    
+
     let start_datetime = DateTime::parse_from_rfc3339(&start_date)
         .unwrap()
         .with_timezone(&Utc);
@@ -134,12 +167,12 @@ async fn create_data_for_plant(
         }
     }
 
-    let count = 1;
+    let count = 0;
     let createduration = start_time.elapsed().as_millis(); // stop timer
     print!("Created the obj list in {} ns", createduration);
     print!("Total duration is {} ns", start_time.elapsed().as_millis());
     let totalduration = start_time.elapsed().as_millis();
-    let insertduration = createduration; 
+    let insertduration = createduration;
     print!("Time for insertion into db -> {}ns", insertduration);
     let programlang = format!("Rust");
     HttpResponse::Created().json(CreateDataResponse {
