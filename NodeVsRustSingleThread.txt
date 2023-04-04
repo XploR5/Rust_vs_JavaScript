@@ -1,3 +1,27 @@
+
+// use std::env;
+// use std::thread;
+// use futures::future::join_all;
+// use tokio::task;
+// use rayon::iter;
+// use std::sync::Arc;
+// use async_std::task;
+// use std::sync::Mutex;
+// use rayon::prelude::*;
+// use std::cell::RefCell;
+// use futures::stream::iter;
+// use tokio::runtime::Runtime;
+// use sqlx::postgres::PgPoolOptions;
+// use sqlx::{Executor, Postgres, Transaction};
+// use rand::SeedableRng;
+// use rand::rngs::StdRng;
+// use postgres::Transaction;
+// use std::mem::replace;
+// use rand::Rng;
+// use sqlx::{pool, Postgres}
+
+
+
 ------------- Test1 --------------
 
 {
@@ -88,6 +112,9 @@ Responce (same)
     "data": "Data Added successfully",
     "count": 4323
 }
+
+
+
 
 
 Rust - 201Created 5.60 s 160 B

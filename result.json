@@ -1,3 +1,94 @@
+--Test JSON (5184010 entries)
+{
+    "plant_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-31T00:00:00.00Z",
+    "interval": 5   
+}
+
+-- Rust Multithreaded optimized (25 Sec)
+{
+    "data": "Data Added successfully",
+    "count": 5184010,
+    "createduration": 25182,
+    "insertduration": 25182,
+    "totalduration": 25182,
+    "programlang": "Rust"
+}
+
+-- JS Multithreaded optimized
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5 sec Rust
+{
+    "plant_id": [1],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-31T00:00:00.00Z",
+    "interval": 5   
+}
+
+
+
+30 Sec Rust
+{
+    "plant_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "start_date": "2023-03-01T00:00:00Z",
+    "end_date": "2023-03-31T00:00:00.00Z",
+    "interval": 5   
+}
+
+
+
+
+
+
+
+
 {
     "plant_id": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     "start_date": "2023-03-01T00:00:00Z",
@@ -5,17 +96,41 @@
     "interval": 5   
 }
 
--- Fastest Yet :)
+-- Fastest Yet :) 16 Seconds Rust MultiThreaded
 {
     "data": "Data Added successfully",
-    "count": 0,
+    "count": 3801610,
     "createduration": 16962,
     "insertduration": 16962,
     "totalduration": 16962,
     "programlang": "Rust"
 }
 
--- Newest
+--- Node JS 45 Seconds (Multithread emulation) --asynchronous programming techniques to allow multiple operations to be executed in parallel
+{
+    "data": "Data Added successfully",
+    "count": 3801610,
+    "createduration": 45677,
+    "insertduration": 45677,
+    "totalduration": 45677,
+    "programlang": "Node.js"
+}
+
+
+
+
+1. Benchmarking on diffrent machines
+2. make the code equivallent
+
+
+
+
+
+
+
+
+
+-- Newest Rust 20 Seconds MT
 {
     "data": "Data Added successfully",
     "count": 3801610,

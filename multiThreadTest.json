@@ -1,0 +1,37 @@
+{
+    "data": "Data Added successfully",
+    "count": 345605,
+    "createduration": 75,
+    "insertduration": 97178,
+    "totalduration": 97253,
+    "programlang": "Rust"
+}
+
+
+
+
+
+{
+    "Tests": [
+        {
+            "plant_id": [
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "start_date": "2023-03-01T00:00:00Z",
+            "end_date": "2023-03-10T00:00:00.00Z",
+            "interval": 5
+        },
+        {
+            "data": "Data Added successfully",
+            "count": 777605,
+            "createduration": 56554,
+            "insertduration": 56554,
+            "totalduration": 56554,
+            "programlang": "Rust"
+        }
+    ]
+}

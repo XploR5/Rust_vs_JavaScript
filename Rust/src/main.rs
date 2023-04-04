@@ -52,7 +52,7 @@ async fn create_and_insert_data(
         current_datetime = current_datetime + interval_duration;
     }
 
-// ------------------ //
+// ------------------ // SUPER IMPORTANT STUFF BELOW
 
 let mut tx = pool.begin().await?;
 
@@ -102,7 +102,8 @@ tx.commit().await?;
 
     
 
-    // --------------------- //
+    // --------------------- // super important stuff abov e
+
 
     print!("The result is: committed\n");
     Ok(())
