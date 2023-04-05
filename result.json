@@ -16,16 +16,29 @@
     "programlang": "Rust"
 }
 
--- JS Multithreaded optimized (34 Sec)
-{
+-- JS Multithreaded optimized (34 Sec, 255% CPU, 6.9 GB Ram)
+-Test 1{
     "data": "Data Added successfully",
     "count": 5184010,
-    "createduration": 34456,
-    "insertduration": 34456,
-    "totalduration": 34456,
-    "programlang": "Node.js"
+    "createduration": 33142,
+    "insertduration": 33142.050847001374,
+    "totalduration": 33142.61389700137,
+    "programlang": "Node.js",
+    "cpuUsage": "259.78%",
+    "ramUsage": "6968.13 MB",
+    "diskIO": "0.00 KB/s"
 }
-
+-Test 2 {
+    "data": "Data Added successfully",
+    "count": 0,
+    "createduration": 35446.37956099957,
+    "insertduration": 35446.37956099957,
+    "totalduration": 35446.75178600103,
+    "programlang": "Node.js",
+    "cpuUsage": "249.73%",
+    "ramUsage": "6870.84 MB",
+    "diskIO": "0.00 KB/s"
+}
 
 
 

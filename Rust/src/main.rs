@@ -55,22 +55,16 @@ async fn create_and_insert_data(
         current_datetime = current_datetime + interval_duration;
     }
 
-// ------------------ // SUPER IMPORTANT STUFF BELOW
-
+// ---------- Data insertion in postgres begins from her
 let mut tx = pool.begin().await?;
-
 // Define the size of the batch
 const BATCH_SIZE: usize = 10000;
-
 // Create a buffer to hold the rows
 let mut buffer = Vec::with_capacity(BATCH_SIZE);
-
 for (index, row) in list.iter().enumerate() {
     let createdat = &row.1;
-
     // Add the row to the buffer
     buffer.push((row.0, createdat, row.2, row.3));
-
     // If the buffer is full or we have reached the end of the list
     if buffer.len() >= BATCH_SIZE || index == list.len() - 1 {
         // Generate the query string with placeholders for multiple rows
@@ -83,36 +77,27 @@ for (index, row) in list.iter().enumerate() {
                 .collect::<Vec<_>>()
                 .join(", ")
         );
-
         // Execute the insert statement with all the rows in the buffer
         let mut query = sqlx::query(&query_str);
         for (i, row) in buffer.iter().enumerate() {
             query = query.bind(row.0).bind(row.1).bind(row.2).bind(row.3);
         }
         let result = query.execute(&mut tx).await;
-
         // Clear the buffer
         buffer.clear();
-
         if result.is_err() {
             let _ = &tx.rollback().await;
             return Err(result.unwrap_err());
         }
     }
 }
-
-
 tx.commit().await?;
-
-    
-
-    // --------------------- // super important stuff above
-
-
+// ---------- Data inserted into database
     print!("The result is: committed\n");
     Ok(())
 }
 
+// Both Creating and inserting data into db with multithreading
 async fn handle_create_req(
     pool: web::Data<PgPool>,
     req: web::Json<CreateDataRequest>,
@@ -123,8 +108,6 @@ async fn handle_create_req(
         end_date,
         interval,
     } = req.into_inner();
-
-
 
     let start_time = Instant::now(); // start timer
 
@@ -170,10 +153,6 @@ async fn handle_create_req(
             eprintln!("Error occurred: {}", e);
         }
     }
-
-    // let mut process = Process::new(std::process::id()).unwrap();
-    // println!("CPU usage: {} %", process.cpu_percent().unwrap());
-
 
     let count = 0;
     let createduration = start_time.elapsed().as_millis(); // stop timer
