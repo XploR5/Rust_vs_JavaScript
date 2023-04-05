@@ -5,7 +5,9 @@ use actix_web::{
 use chrono::{DateTime, Utc};
 use fastrand::i32;
 use sqlx::postgres::{PgConnectOptions, PgPool};
-use std::time::{Duration, Instant};
+use std::{time::{Duration, Instant}};
+// use systemstat::{Platform, System};
+// use psutil::process::Process;
 
 #[derive(Debug, serde::Deserialize)]
 struct CreateDataRequest {
@@ -25,6 +27,7 @@ struct CreateDataResponse {
     programlang: String,
 }
 
+
 async fn create_and_insert_data(
     plant: i32,
     start_datetime: DateTime<Utc>,
@@ -36,7 +39,7 @@ async fn create_and_insert_data(
         "plant: {} with st_dtc: {}  end: {} dur: {}\n",
         plant, start_datetime, end_datetime, interval_duration
     );
-
+    
     let mut list = Vec::new();
 
     let mut current_datetime = start_datetime;
@@ -98,6 +101,7 @@ for (index, row) in list.iter().enumerate() {
     }
 }
 
+
 tx.commit().await?;
 
     
@@ -109,7 +113,7 @@ tx.commit().await?;
     Ok(())
 }
 
-async fn create_data_for_plant(
+async fn handle_create_req(
     pool: web::Data<PgPool>,
     req: web::Json<CreateDataRequest>,
 ) -> impl Responder {
@@ -119,6 +123,8 @@ async fn create_data_for_plant(
         end_date,
         interval,
     } = req.into_inner();
+
+
 
     let start_time = Instant::now(); // start timer
 
@@ -165,6 +171,10 @@ async fn create_data_for_plant(
         }
     }
 
+    // let mut process = Process::new(std::process::id()).unwrap();
+    // println!("CPU usage: {} %", process.cpu_percent().unwrap());
+
+
     let count = 0;
     let createduration = start_time.elapsed().as_millis(); // stop timer
     print!("Created the obj list in {} ns", createduration);
@@ -198,9 +208,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(pool.clone()))
-            .service(web::resource("/createdata").route(web::post().to(create_data_for_plant)))
+            .service(web::resource("/createdata").route(web::post().to(handle_create_req)))
     })
     .bind("127.0.0.1:3000")?
     .run()
     .await
-}
+}   
