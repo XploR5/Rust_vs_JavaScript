@@ -16,8 +16,15 @@
     "programlang": "Rust"
 }
 
--- JS Multithreaded optimized
-
+-- JS Multithreaded optimized (34 Sec)
+{
+    "data": "Data Added successfully",
+    "count": 5184010,
+    "createduration": 34456,
+    "insertduration": 34456,
+    "totalduration": 34456,
+    "programlang": "Node.js"
+}
 
 
 
