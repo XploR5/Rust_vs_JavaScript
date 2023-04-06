@@ -3,7 +3,6 @@ const { performance } = require('perf_hooks');
 const { Worker } = require('worker_threads');
 
 async function handle_create_req(req, res) {
-
     const { plantId, startDate, endDate, interval } = req.body;
     const startTime = performance.now();
 
@@ -43,8 +42,7 @@ async function handle_create_req(req, res) {
     const usedMemory = totalMemory - os.freemem();
     const ramUsageInBytes = usedMemory / (1024 * 1024); // convert to MB
 
-    // Calculate Disk I/O
-    // Add your logic to calculate Disk I/O here
+    // Calculate Disk I/O // Add your logic to calculate Disk I/O here
     const diskIO = 0; // Placeholder for disk I/O
 
     const totalduration = performance.now() - startTime;

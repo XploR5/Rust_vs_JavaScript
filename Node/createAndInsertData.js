@@ -14,8 +14,7 @@ const dbPool = new Pool({
 
 async function createAndInsertData(workerData) {
     const { plant, startDate, endDate, interval } = workerData;
-
-    
+        
     const startDatetime = DateTime.fromISO(startDate, { zone: "utc" });
     const endDatetime = DateTime.fromISO(endDate, { zone: "utc" });
     const intervalDuration = Duration.fromObject({ seconds: interval });

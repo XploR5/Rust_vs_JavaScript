@@ -6,8 +6,6 @@ use chrono::{DateTime, Utc};
 use fastrand::i32;
 use sqlx::postgres::{PgConnectOptions, PgPool};
 use std::{time::{Duration, Instant}};
-// use systemstat::{Platform, System};
-// use psutil::process::Process;
 
 #[derive(Debug, serde::Deserialize)]
 struct CreateDataRequest {
@@ -35,10 +33,6 @@ async fn create_and_insert_data(
     interval_duration: chrono::Duration,
     pool: web::Data<PgPool>,
 ) -> Result<(), sqlx::Error> {
-    print!(
-        "plant: {} with st_dtc: {}  end: {} dur: {}\n",
-        plant, start_datetime, end_datetime, interval_duration
-    );
     
     let mut list = Vec::new();
 
